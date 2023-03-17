@@ -1,6 +1,6 @@
 # Bayesian Cluster Analysis
 
-This repository describes the application of bayesian cluster analysis to a medical test known as (BASMI).
+This repository describes the application of bayesian cluster analysis to a medical test known as (BASMI). The develope code is written in [R](https://cran.r-project.org/).
 
 Bath Ankylosing Spondylitis Metrology Index (BASMI) ... (*Naty please continue here*).
 
