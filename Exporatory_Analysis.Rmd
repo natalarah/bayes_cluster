@@ -1,0 +1,107 @@
+---
+title: "Exploratory Data Analysis: Patients vs. Controls"
+author: "Natalia Lara & Juan Martinez"
+date: "3/16/2023"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    toc_depth: 2
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
+library(tidyverse)
+library(readr)
+library(kableExtra)
+library(plotly)
+```
+
+# Introduction
+
+
+# Data 
+
+## Patients
+
+```{r data1}
+patients <- read_csv('Data/patients.csv')
+
+patients %>%
+  kbl(booktabs = T) %>%
+  kable_material(c('hover', 'striped'), full_width = F) %>%
+  scroll_box(width = "100%", height = "250px")
+```
+
+## Controls
+
+```{r data2}
+controls <- read_csv('Data/controls.csv')
+
+controls %>%
+  kbl(booktabs = T) %>%
+  kable_material(c('hover', 'striped'), full_width = F) %>%
+  scroll_box(width = "100%", height = "250px")
+```
+
+
+# Differences
+
+## Rotacion Cervical (Grados)
+
+
+```{r}
+patients %>%
+  ggplot(aes(x = ROTA_CERV_MANUAL_DERECHA)) +
+  geom_density(aes(fill = 'Manual', colour = 'Manual'), alpha = 0.2) +
+  geom_density(aes(x = ROTA_CERV_LAB_DERECHA, colour = 'Laboratory',
+                   fill = 'Laboratory'), alpha = 0.2) +
+  xlab('Rotacion Cervical Derecha (Grados)') +
+  theme(legend.position = 'bottom')
+```
+
+```{r}
+patients %>%
+  ggplot(aes(x = ROTA_CERV_MANUAL_IZQUIERDA)) +
+  geom_density(aes(fill = 'Manual', colour = 'Manual'), alpha = 0.2) +
+  geom_density(aes(x = ROTA_CERV_LAB_IZQUIERDA, colour = 'Laboratory',
+                   fill = 'Laboratory'), alpha = 0.2) +
+  xlab('Rotacion Cervical Derecha (Grados)') +
+  theme(legend.position = 'bottom')
+```
+
+
+## Flexion Frontal Cervical (Grados)
+
+
+```{r}
+fig3 <- patients %>%
+  ggplot(aes(x = FLEX_FRONT_CERV_MANUAL_GRAD_FLEXION)) +
+  geom_density(aes(fill = 'Manual', colour = 'Manual'), alpha = 0.2) +
+  geom_density(aes(x = FLEX_FRONT_CERV_LAB_GRAD_FLEXION, colour = 'Laboratory',
+                   fill = 'Laboratory'), alpha = 0.2) +
+  xlab('Flexion Frontal Cervical (Grados)') +
+  theme(legend.position = 'bottom')
+
+ggplotly(fig3, tooltip = "all")
+```
+
+
+```{r}
+fig4 <- patients %>%
+  ggplot(aes(x = FLEX_FRONT_CERV_MANUAL_GRAD_EXTESION)) +
+  geom_density(aes(fill = 'Manual', colour = 'Manual'), alpha = 0.2) +
+  geom_density(aes(x = FLEX_FRONT_CERV_LAB_GRAD_EXTESION, colour = 'Laboratory',
+                   fill = 'Laboratory'), alpha = 0.2) +
+  xlab('Flexion Frontal Cervical (Grados)') +
+  theme(legend.position = 'bottom')
+
+ggplotly(fig4, tooltip = "all")
+```
+
+# Conclusions
+
+**Preciosa**, la idea es hacer todos los analisis aqui. Que te parece? Sabes que cuentas con todo mi apoyo. **Te amo!**
