@@ -15,8 +15,11 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = F, warning = F)
 library(tidyverse)
+library(tidyr)
+library(stringr)
 library(readr)
 library(kableExtra)
+library(ggdendro)
 library(plotly)
 ```
 
@@ -29,6 +32,22 @@ library(plotly)
 
 ```{r data1}
 patients <- read_csv('Data/patients.csv')
+patients$NUMERO <- as_factor(patients$NUMERO)
+patients$ID <- as_factor(patients$ID)
+patients$BIOLOGICO <- as_factor(patients$BIOLOGICO)
+patients$TIPO <- as_factor(patients$TIPO)
+
+sep_bp_patients <- str_split(patients$PRESION_ARTERIAL, '/')
+
+SYSTOLIC = DIASTOLIC = 0
+
+for(i in (1:nrow(patients))){
+  SYSTOLIC[i] = as.numeric(sep_bp_patients[[i]][1])
+  DIASTOLIC[i] = as.numeric(sep_bp_patients[[i]][2])
+}
+
+patients$SYSTOLIC <- SYSTOLIC
+patients$DIASTOLIC <- DIASTOLIC
 
 patients %>%
   kbl(booktabs = T) %>%
@@ -101,6 +120,41 @@ fig4 <- patients %>%
 
 ggplotly(fig4, tooltip = "all")
 ```
+
+
+## Dissimilarity
+
+```{r}
+diss_manual <- dist(patients[,c(8,9,12,13,16,17,20, 22, 23,26)])
+hc_patients_manual <- hclust(diss_manual)
+
+plot(hc_patients_manual, xlab = 'Clusters - Manual')
+```
+
+
+```{r}
+ggdendrogram(hc_patients_manual)
+```
+
+
+
+
+# BASMI scores
+
+```{r}
+basmi_score <- function(){
+  
+}
+```
+
+
+## Manual data
+
+
+
+## Laboratory data
+
+
 
 # Conclusions
 
