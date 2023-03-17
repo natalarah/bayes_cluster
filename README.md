@@ -8,4 +8,4 @@ There are different online applications that can calculate the [BASMI index](htt
 
 ## Articles of interest
 
-* [Normative values for the Bath Ankylosing Spondylitis Metrology Index in a UK population]
+* [Normative values for the Bath Ankylosing Spondylitis Metrology Index in a UK population](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3798717/).
