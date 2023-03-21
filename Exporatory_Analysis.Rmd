@@ -154,6 +154,7 @@ basmi_score <- function(){
 
 ## Laboratory data
 
+* Amor mío*, gracias, gracias, gracias por tu tiempo, te amo!
 
 
 # Conclusions
