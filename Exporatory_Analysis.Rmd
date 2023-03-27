@@ -142,11 +142,58 @@ ggdendrogram(hc_patients_manual)
 # BASMI scores
 
 ```{r}
-basmi_score <- function(){
+basmi_score <- function(FLL, Schober, DI, RC){
   
+  # Lateral lumbar Flexion score 
+  if(FLL > 10){
+    score_FLL=1
+  }
+  else if ((FLL >= 5) & (FLL<=10)){
+    score_FLL=2
+  }
+  else{
+    score_FLL=3
+  }
+  
+  # Schober score
+  
+  if(Schober > 4){
+    score_Schober=1
+  }
+  else if ((Schober >= 2) & (Schober <=4)){
+    score_Schober=2
+  }
+  else{
+    score_Schober=3
+  }
+  
+  # Intermalleolar distance score
+  
+  if(DI > 100){
+    score_DI=1
+  }
+  else if ((DI >= 70) & (DI <=100)){
+    score_DI=2
+  }
+  else{
+    score_DI=3
+  }
+  
+  # Cervical rotation score
+  
+  if(RC > 70){
+    score_RC=1
+  }
+  else if ((RC >= 20) & (RC <=70)){
+    score_RC=2
+  }
+  else{
+    score_RC=3
+  }
+  return(score_FLL+score_Schober+score_DI+score_RC)
 }
+basmi_score(10,19.5,28.3,50)
 ```
-
 
 ## Manual data
 
@@ -160,3 +207,4 @@ basmi_score <- function(){
 # Conclusions
 
 **Preciosa**, la idea es hacer todos los analisis aqui. Que te parece? Sabes que cuentas con todo mi apoyo. **Te amo!**
+
