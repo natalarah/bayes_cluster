@@ -25,6 +25,7 @@ library(plotly)
 
 # Introduction
 
+This document presents some preliminary analysis of the mobility dataset gathered in 2019 at the Military Hospital. 
 
 # Data 
 
