@@ -80,6 +80,8 @@ controls %>%
 
 # Differences
 
+We compare the differences between the reported measurements from the manual and optical system. This comparison was made for each variable. For instance, we compared the results from the cervial rotation using the manual instrument and optical system.
+
 ## Rotacion Cervical (Grados)
 
 
