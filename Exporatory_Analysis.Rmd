@@ -25,9 +25,29 @@ library(plotly)
 
 # Introduction
 
-This document presents some preliminary analysis of the spinal mobility dataset gathered in 2019 at the Biomechanics Lab of ECCI with patients from the Military Hospital. The study was conducted on 21 patients with different socio-demographic characteristics. There were two
+Ankylosing Spondylitis (AS) is part of Spondyloarthopaties, a group of chronic inflammatory diseases that causes rheumatic disorders of the spine. Mobility assessment of the spine joint is an essential criterion for the diagnostic or treatment follow up of patients with AS. Some indices, such as the Bath Ankylosing Spondylitis Metrology Index (BASMI), has been generally used by rheumatologists in the clinical setting. The BASMI index consists of five functional movements that provide a general assessment of the patient based on the spinal impairments using metric tape and goniometer. However, the obtained measurements has systematic errors, low accuracy, and it is user-dependent. Optical systems have been developed from new technologies in the field of sensors and motion capture. These systems can gather high precision data and it is not user-dependent.
+
+This document presents some preliminary analysis of the spinal mobility dataset gathered in 2019 at the Biomechanics Lab of ECCI with a group of volunteers and AS patients from the Military Hospital. The measurements were carried out using both methods on the same individual: manual and optical system.
+
 
 # Data 
+
+The study was conducted on 21 patients and 21 controls with different socio-demographic characteristics. The manual method was  
+
+
+
+There were two 
+
+
+BASMI
+
+Tragus to Wall
+Lumbar side flexion
+Lumbar Flexion (modified Schober’s)
+Cervical Rotation
+Intermalleolar Distance
+
+
 
 Random experiment. Two main groups: manual and optical system.
 
@@ -135,7 +155,7 @@ ggplotly(fig4, tooltip = "all")
 ```
 
 
-## Dissimilarity
+## Cluster analysis
 
 ```{r}
 diss_manual <- dist(patients[,c(8,9,12,13,16,17,20, 22, 23,26)])
@@ -158,7 +178,7 @@ The results suggests that there are significant differences  between the approac
 
 This section contains analysis or functions that can be used in the analysis. 
 
-## BASMI scores
+## BASMI scores {-}
 
 The BASMI score is a standard method to assess the mobility of patients with gait disorders. The following chunck describes how the `basmi_score()` functions is built in `R`: 
 
