@@ -208,16 +208,9 @@ basmi_score <- function(FLL, Schober, DI, RC){
 basmi_score(10,19.5,28.3,50)
 ```
 
-## Manual data
-
-
-
-## Laboratory data
-
-* Amor mío*, gracias, gracias, gracias por tu tiempo, te amo!
 
 
 # Conclusions
 
-**Preciosa**, la idea es hacer todos los analisis aqui. Que te parece? Sabes que cuentas con todo mi apoyo. **Te amo!**
+The results suggests that there are significant differences  between the approaches (manual and optical system). Clearly, the optical system is more accurate than the manual approach and its results can be set as a *gold* standard. Also, these results suggest that even well trained personnel can report biased results.
 
