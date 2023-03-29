@@ -29,6 +29,14 @@ This document presents some preliminary analysis of the mobility dataset gathere
 
 # Data 
 
+Random experiment. Two main groups: manual and optical system.
+
+* Schobert: goihgosjg
+
+
+* Flexion:
+
+
 ## Patients
 
 ```{r data1}
