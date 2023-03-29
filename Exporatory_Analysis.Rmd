@@ -149,10 +149,18 @@ plot(hc_patients_manual, xlab = 'Clusters - Manual')
 ggdendrogram(hc_patients_manual)
 ```
 
+# Conclusions
+
+The results suggests that there are significant differences  between the approaches (manual and optical system). Clearly, the optical system is more accurate than the manual approach and its results can be set as a *gold* standard. Also, these results suggest that even well trained personnel can report biased results.
 
 
+# Appendix {-}
 
-# BASMI scores
+This section contains analysis or functions that can be used in the analysis. 
+
+## BASMI scores
+
+The BASMI score is a standard method to assess the mobility of patients with gait disorders. 
 
 ```{r}
 basmi_score <- function(FLL, Schober, DI, RC){
@@ -207,10 +215,3 @@ basmi_score <- function(FLL, Schober, DI, RC){
 }
 basmi_score(10,19.5,28.3,50)
 ```
-
-
-
-# Conclusions
-
-The results suggests that there are significant differences  between the approaches (manual and optical system). Clearly, the optical system is more accurate than the manual approach and its results can be set as a *gold* standard. Also, these results suggest that even well trained personnel can report biased results.
-
