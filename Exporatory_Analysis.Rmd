@@ -25,7 +25,7 @@ library(plotly)
 
 # Introduction
 
-This document presents some preliminary analysis of the mobility dataset gathered in 2019 at the Military Hospital. 
+This document presents some preliminary analysis of the mobility dataset gathered in 2019 at the Military Hospital. The study was conducted on 21 patients with different socio-demographic characteristics. There were two
 
 # Data 
 
