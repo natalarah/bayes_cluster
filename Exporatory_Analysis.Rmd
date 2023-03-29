@@ -37,6 +37,8 @@ Random experiment. Two main groups: manual and optical system.
 * Flexion:
 
 
+rotación
+
 ## Patients
 
 ```{r data1}
