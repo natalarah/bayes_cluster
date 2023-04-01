@@ -1,0 +1,403 @@
+---
+title: "Modeling Approaches"
+author: "Natalia Lara & Juan Martinez"
+date: "4/1/2023"
+output:
+  html_document:
+    toc: true
+    code_folding: hide
+    number_sections: true
+    toc_depth: 2
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidyr)
+library(stringr)
+library(readr)
+library(plotROC)
+library(kableExtra)
+library(ggdendro)
+library(caret)
+library(plotly)
+```
+
+# Introduction
+
+This document presents some preliminary analysis of the mobility dataset gathered in 2019 at the Military Hospital. 
+
+based on the spinal impairments using metric tape and goniometers. However, the obtained measurements has systematic errors, low accuracy, and it is user-dependent. 
+
+Optical systems have been developed from new technologies in the field of sensors and motion capture. These systems can gather high precision data and it is not user-dependent. 
+
+# Data 
+
+The study was conducted on 21 patients and 21 controls with different socio-demographic characteristics. Both methods were applied at ECCI's  Biomechanics Lab. The manual method was carried out before the optimcal system. The data and results derived from the manual system were carried out by trained personnel from the Military Hospital. 
+
+The optical system had 6 Optitrack Flex 3 cameras with an acquisition rate of 100 fps. The calibration and acquisition of the kinematic data was carried out through the Motive software and, later, the data were processed through the Visual 3D software, to obtain the spinal mobility results. The experimental protocol included 29 reflective markers placed on the patient or individual's body.
+
+## Patients
+
+The following table presents the variables that were measurements for the patients with gait disorder:
+
+```{r data1}
+patients <- read_csv('Data/patients.csv')
+patients$NUMERO <- as_factor(patients$NUMERO)
+patients$ID <- as_factor(patients$ID)
+patients$BIOLOGICO <- as_factor(patients$BIOLOGICO)
+patients$TIPO <- as_factor(patients$TIPO)
+patients$CONTROLADO <- as_factor(patients$CONTROLADO)
+
+sep_bp_patients <- str_split(patients$PRESION_ARTERIAL, '/')
+
+SYSTOLIC = DIASTOLIC = 0
+
+for(i in (1:nrow(patients))){
+  SYSTOLIC[i] = as.numeric(sep_bp_patients[[i]][1])
+  DIASTOLIC[i] = as.numeric(sep_bp_patients[[i]][2])
+}
+
+patients$SYSTOLIC <- SYSTOLIC
+patients$DIASTOLIC <- DIASTOLIC
+
+patients %>%
+  kbl(booktabs = T) %>%
+  kable_material(c('hover', 'striped'), full_width = F) %>%
+  scroll_box(width = "100%", height = "350px")
+```
+
+### Logistic Regression
+
+```{r}
+ROTA_CERV_MANUAL_DERECHA_log_reg <- glm(CONTROLADO ~ ROTA_CERV_MANUAL_DERECHA,
+                                        data = patients, family = "binomial")
+
+```
+
+Cutoffs:
+
+```{r}
+
+test_pred_20 <- predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                        patients, type = 'response')
+
+test_pred_20 <- as_factor(if_else(test_pred_20 > 0.2, 'SI', 'NO'))
+
+
+test_pred_30 <- predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                        patients, type = 'response')
+
+test_pred_30 <- as_factor(if_else(test_pred_30 > 0.3, 'SI', 'NO'))
+
+
+test_pred_50 <- predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                        patients, type = 'response')
+
+test_pred_50 <- as_factor(if_else(test_pred_50 > 0.5, 'SI', 'NO'))
+
+
+test_pred_70 <- predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                        patients, type = 'response')
+
+test_pred_70 <- as_factor(if_else(test_pred_70 > 0.7, 'SI', 'NO'))
+
+test_pred_90 <- predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                        patients, type = 'response')
+
+test_pred_90 <- as_factor(if_else(test_pred_90 > 0.9, 'SI', 'NO'))
+
+```
+
+Then,
+
+```{r}
+
+test_con_mat_20 = confusionMatrix(test_pred_20,
+                                  patients$CONTROLADO)
+test_con_mat_30 = confusionMatrix(test_pred_30,
+                                  patients$CONTROLADO)
+test_con_mat_50 = confusionMatrix(test_pred_50,
+                                  patients$CONTROLADO)
+test_con_mat_70 = confusionMatrix(test_pred_70,
+                                  patients$CONTROLADO)
+test_con_mat_90 = confusionMatrix(test_pred_90,
+                                  patients$CONTROLADO)
+```
+
+Then,
+
+```{r}
+metrics = rbind(
+  
+  c(test_con_mat_20$overall["Accuracy"], 
+    test_con_mat_20$byClass["Sensitivity"], 
+    test_con_mat_20$byClass["Specificity"]),
+  
+  c(test_con_mat_30$overall["Accuracy"], 
+    test_con_mat_30$byClass["Sensitivity"], 
+    test_con_mat_30$byClass["Specificity"]),
+  
+  c(test_con_mat_50$overall["Accuracy"], 
+    test_con_mat_50$byClass["Sensitivity"], 
+    test_con_mat_50$byClass["Specificity"]),
+  
+  c(test_con_mat_70$overall["Accuracy"], 
+    test_con_mat_70$byClass["Sensitivity"], 
+    test_con_mat_70$byClass["Specificity"]),
+  
+  c(test_con_mat_90$overall["Accuracy"], 
+    test_con_mat_90$byClass["Sensitivity"], 
+    test_con_mat_90$byClass["Specificity"])
+
+)
+
+rownames(metrics) = c('c = 0.20', 'c = 0.30', 'c = 0.50', 'c = 0.70', 'c = 0.90')
+
+metrics
+
+```
+ROC
+
+```{r}
+library(pROC)
+test_prob = predict(ROTA_CERV_MANUAL_DERECHA_log_reg,
+                    newdata = patients,
+                    type = "response")
+test_roc = roc(patients$CONTROLADO ~ test_prob, plot = TRUE, print.auc = TRUE)
+```
+
+
+```{r}
+
+get_roc_curve <- function(mod){
+  
+  test_pred_20 <- predict(mod,
+                        patients, type = 'response')
+  
+  test_pred_20 <- as_factor(if_else(test_pred_20 < 0.2, 'SI', 'NO'))
+  
+  
+  test_pred_30 <- predict(mod,
+                          patients, type = 'response')
+  
+  test_pred_30 <- as_factor(if_else(test_pred_30 < 0.3, 'SI', 'NO'))
+  
+  #test_pred_40 <- predict(mod,
+  #                        patients, type = 'response')
+  #test_pred_40 <- as_factor(if_else(test_pred_40 < 0.4, 'SI', 'NO'))
+  
+  
+  test_pred_50 <- predict(mod,
+                          patients, type = 'response')
+  
+  test_pred_50 <- as_factor(if_else(test_pred_50 < 0.5, 'SI', 'NO'))
+  
+  #test_pred_60 <- predict(mod,
+  #                        patients, type = 'response')
+  #test_pred_60 <- as_factor(if_else(test_pred_60 < 0.6, 'SI', 'NO'))
+  
+  test_pred_70 <- predict(mod,
+                          patients, type = 'response')
+  
+  test_pred_70 <- as_factor(if_else(test_pred_70 < 0.7, 'SI', 'NO'))
+  
+  #test_pred_80 <- predict(mod,
+  #                        patients, type = 'response')
+  #test_pred_80 <- as_factor(if_else(test_pred_80 < 0.8, 'SI', 'NO'))
+  
+  test_pred_90 <- predict(mod,
+                          patients, type = 'response')
+  
+  test_pred_90 <- as_factor(if_else(test_pred_90 < 0.9, 'SI', 'NO'))
+  
+  #test_pred_95 <- predict(mod,
+  #                        patients, type = 'response')
+  
+  #test_pred_95 <- as_factor(if_else(test_pred_95 < 0.95, 'SI', 'NO'))
+  
+  # Confusion Matrix:
+  
+  test_con_mat_20 = confusionMatrix(test_pred_20,
+                                    patients$CONTROLADO)
+
+  test_con_mat_30 = confusionMatrix(test_pred_30,
+                                    patients$CONTROLADO)
+  #test_con_mat_40 = confusionMatrix(test_pred_40,
+  #                                  patients$CONTROLADO)
+  test_con_mat_50 = confusionMatrix(test_pred_50,
+                                    patients$CONTROLADO)
+  #test_con_mat_60 = confusionMatrix(test_pred_60,
+  #                                  patients$CONTROLADO)
+  test_con_mat_70 = confusionMatrix(test_pred_70,
+                                    patients$CONTROLADO)
+  #test_con_mat_80 = confusionMatrix(test_pred_80,
+  #                                  patients$CONTROLADO)
+  test_con_mat_90 = confusionMatrix(test_pred_90,
+                                    patients$CONTROLADO)
+  #test_con_mat_95 = confusionMatrix(test_pred_95,
+  #                                  patients$CONTROLADO)
+  
+  # Metrics:
+  
+  metrics = rbind(
+  
+  c(test_con_mat_20$overall["Accuracy"], 
+    test_con_mat_20$byClass["Sensitivity"], 
+    test_con_mat_20$byClass["Specificity"]),
+  
+  c(test_con_mat_30$overall["Accuracy"], 
+    test_con_mat_30$byClass["Sensitivity"], 
+    test_con_mat_30$byClass["Specificity"]),
+  
+  #c(test_con_mat_40$overall["Accuracy"], 
+  #  test_con_mat_40$byClass["Sensitivity"], 
+  #  test_con_mat_40$byClass["Specificity"]),
+  
+  c(test_con_mat_50$overall["Accuracy"], 
+    test_con_mat_50$byClass["Sensitivity"], 
+    test_con_mat_50$byClass["Specificity"]),
+  
+  #c(test_con_mat_60$overall["Accuracy"], 
+  #  test_con_mat_60$byClass["Sensitivity"], 
+  #  test_con_mat_60$byClass["Specificity"]),
+  
+  c(test_con_mat_70$overall["Accuracy"], 
+    test_con_mat_70$byClass["Sensitivity"], 
+    test_con_mat_70$byClass["Specificity"]),
+  
+  #c(test_con_mat_80$overall["Accuracy"], 
+  #  test_con_mat_80$byClass["Sensitivity"], 
+  #  test_con_mat_80$byClass["Specificity"]),
+  
+  c(test_con_mat_90$overall["Accuracy"], 
+    test_con_mat_90$byClass["Sensitivity"], 
+    test_con_mat_90$byClass["Specificity"])#,
+  
+  #c(test_con_mat_95$overall["Accuracy"], 
+  #  test_con_mat_95$byClass["Sensitivity"], 
+  #  test_con_mat_95$byClass["Specificity"]),
+  )
+  
+  #rownames(metrics) = c('c = 0.20', 'c = 0.30', 'c = 0.40',
+  #                      'c = 0.50', 'c = 0.60', 'c = 0.70',
+  #                      'c = 0.80', 'c = 0.90', 'c = 0.95')
+  
+  rownames(metrics) = c('c = 0.20', 'c = 0.30', 'c = 0.50',
+                        'c = 0.70', 'c = 0.90')
+  
+  # ROC curve:
+  
+  test_prob = predict(mod,
+                      newdata = patients,
+                      type = "response")
+  
+  test_roc = roc(patients$CONTROLADO ~ test_prob, plot = TRUE, print.auc = TRUE)
+  
+}
+
+```
+
+Then,
+
+```{r}
+
+ROTA_CERV_LAB_DERECHA_log_reg <- glm(CONTROLADO ~ ROTA_CERV_LAB_DERECHA,
+                                       data = patients, family = "binomial")
+
+get_roc_curve(ROTA_CERV_LAB_DERECHA_log_reg)
+
+```
+Then,
+
+```{r}
+
+ROTA_CERV_LAB_IZQUIERDA_log_reg <- glm(CONTROLADO ~ ROTA_CERV_LAB_IZQUIERDA,
+                                          data = patients, family = "binomial")
+
+get_roc_curve(ROTA_CERV_LAB_IZQUIERDA_log_reg)
+
+```
+Then,
+
+```{r}
+
+SHOBERT_MODIFICADO_CM_LABORATORIO_log_reg <- glm(CONTROLADO ~ SHOBERT_MODIFICADO_CM_LABORATORIO,
+                                                 data = patients, family = "binomial")
+
+get_roc_curve(SHOBERT_MODIFICADO_CM_LABORATORIO_log_reg)
+
+```
+
+
+
+
+```{r}
+
+DISTANCIA_INTERMALEOLAR_LAB_CM_log_reg <- glm(CONTROLADO ~ DISTANCIA_INTERMALEOLAR_LAB_CM,
+                                                 data = patients, family = "binomial")
+
+get_roc_curve(DISTANCIA_INTERMALEOLAR_LAB_CM_log_reg)
+
+```
+Then,
+
+```{r}
+
+patients_full_log_reg <- glm(CONTROLADO ~ ROTA_CERV_LAB_DERECHA +
+                               ROTA_CERV_LAB_IZQUIERDA +
+                               FLEX_FRONT_CERV_LAB_GRAD_FLEXION +
+                               FLEX_FRONT_CERV_LAB_GRAD_EXTESION +
+                               FLEX_LAT_CERV_LAB_GRAD_DERECHA +
+                               FLEX_LAT_CERV_LAB_GRAD_IZQUIERDA +
+                               FLEX_LUMBAR_LAT_LAB_CM_IZQUIERDA +
+                               SHOBERT_MODIFICADO_CM_LABORATORIO +
+                               DISTANCIA_INTERMALEOLAR_LAB_CM,
+                             data = patients, family = "binomial")
+
+get_roc_curve(patients_full_log_reg)
+```
+
+# SUB-MODELS
+
+```{r}
+patients_A_full_log_reg <- glm(CONTROLADO ~ ROTA_CERV_LAB_DERECHA +
+                               ROTA_CERV_LAB_IZQUIERDA +
+                               FLEX_FRONT_CERV_LAB_GRAD_FLEXION +
+                               FLEX_FRONT_CERV_LAB_GRAD_EXTESION +
+                               FLEX_LAT_CERV_LAB_GRAD_DERECHA +
+                               FLEX_LAT_CERV_LAB_GRAD_IZQUIERDA +
+                               FLEX_LUMBAR_LAT_LAB_CM_IZQUIERDA +
+                               SHOBERT_MODIFICADO_CM_LABORATORIO,
+                             data = patients, family = "binomial")
+
+get_roc_curve(patients_A_full_log_reg)
+```
+```{r}
+patients_B_full_log_reg <- glm(CONTROLADO ~ ROTA_CERV_LAB_DERECHA +
+                               ROTA_CERV_LAB_IZQUIERDA +
+                               FLEX_FRONT_CERV_LAB_GRAD_FLEXION +
+                               FLEX_FRONT_CERV_LAB_GRAD_EXTESION +
+                               FLEX_LAT_CERV_LAB_GRAD_DERECHA +
+                               FLEX_LAT_CERV_LAB_GRAD_IZQUIERDA +
+                               FLEX_LUMBAR_LAT_LAB_CM_IZQUIERDA +
+                                DISTANCIA_INTERMALEOLAR_LAB_CM,
+                             data = patients, family = "binomial")
+
+get_roc_curve(patients_B_full_log_reg)
+```
+
+```{r}
+patients_B_full_log_reg_pred <- predict(patients_B_full_log_reg, patients,
+                                        type = 'response')
+
+patients_B_full_log_reg_pred <- as_factor(if_else(patients_B_full_log_reg_pred < 0.5,
+                                                  'SI', 'NO'))
+
+confusionMatrix(patients_B_full_log_reg_pred, patients$CONTROLADO)
+
+```
+
